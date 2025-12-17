@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暗記4役アプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            background-color: #3a3a3a;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+            background-color: #0066cc;
+        }
+
+        .tab:hover {
+            background-color: #4a4a4a;
+        }
+
+        .tab.active:hover {
+            background-color: #0077ee;
+        }
+
+        .content {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            color: #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0077ee;
+        }
+
+        button.secondary {
+            background-color: #4a4a4a;
+        }
+
+        button.secondary:hover {
+            background-color: #5a5a5a;
+        }
+
+        button.success {
+            background-color: #28a745;
+        }
+
+        button.success:hover {
+            background-color: #34ce57;
+        }
+
+        button.danger {
+            background-color: #dc3545;
+        }
+
+        button.danger:hover {
+            background-color: #e94555;
+        }
+
+        .error-message {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .item-list {
+            margin-top: 20px;
+        }
+
+        .item {
+            background-color: #3a3a3a;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #0066cc;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-subject {
+            background-color: #0066cc;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .item-accuracy {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .item-content {
+            margin-bottom: 10px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .item-actions button {
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .study-view {
+            text-align: center;
+        }
+
+        .question-display {
+            background-color: #3a3a3a;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .answer-text {
+            font-size: 16px;
+            color: #4CAF50;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 60px;
+            border-bottom: 2px solid #0066cc;
+            margin: 0 5px;
+            padding: 0 5px;
+        }
+
+        .judgment-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-info {
+            text-align: center;
+            margin-top: 10px;
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .tabs {
+                padding: 5px;
+                gap: 3px;
+            }
+            
+            .tab {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+            
+            .question-text {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('word')">単語</button>
+            <button class="tab" onclick="switchTab('qa')">一問一答</button>
+            <button class="tab" onclick="switchTab('formula')">公式</button>
+            <button class="tab" onclick="switchTab('cloze')">穴埋め</button>
+            <button class="tab" onclick="switchTab('test')">テスト</button>
+        </div>
+
+        <!-- 単語 -->
+        <div id="word" class="content active">
+            <div class="error-message" id="word-error"></div>
+            <div class="form-group">
+                <label>教科</label>
+                <select id="word-subject">
+                    <option value="国語">国語</option>
+                    <option value="英語">英語</option>
+                    <option value="英語表現">英語表現</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="情報">情報</option>
+                    <option value="数学B">数学B</option>
+                    <option value="数学C">数学C</option>
+                    <option value="社会">社会</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>単語</label>
+                <input type="text" id="word-term" placeholder="単語を入力">
+            </div>
+            <div class="form-group">
+                <label>意味</label>
+                <input type="text" id="word-meaning" placeholder="意味を入力">
+            </div>
+            <button onclick="addWord()">登録</button>
+            <button class="secondary" onclick="startStudy('word')">学習開始</button>
+            <div class="item-list" id="word-list"></div>
+        </div>
+
+        <!-- 一問一答 -->
+        <div id="qa" class="content">
+            <div class="error-message" id="qa-error"></div>
+            <div class="form-group">
+                <label>教科</label>
+                <select id="qa-subject">
+                    <option value="国語">国語</option>
+                    <option value="英語">英語</option>
+                    <option value="英語表現">英語表現</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="情報">情報</option>
+                    <option value="数学B">数学B</option>
+                    <option value="数学C">数学C</option>
+                    <option value="社会">社会</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>問題</label>
+                <textarea id="qa-question" placeholder="問題を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label>答え</label>
+                <textarea id="qa-answer" placeholder="答えを入力"></textarea>
+            </div>
+            <button onclick="addQA()">登録</button>
+            <button class="secondary" onclick="startStudy('qa')">学習開始</button>
+            <div class="item-list" id="qa-list"></div>
+        </div>
+
+        <!-- 公式 -->
+        <div id="formula" class="content">
+            <div class="error-message" id="formula-error"></div>
+            <div class="form-group">
+                <label>教科</label>
+                <select id="formula-subject">
+                    <option value="国語">国語</option>
+                    <option value="英語">英語</option>
+                    <option value="英語表現">英語表現</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="情報">情報</option>
+                    <option value="数学B">数学B</option>
+                    <option value="数学C">数学C</option>
+                    <option value="社会">社会</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>公式名</label>
+                <input type="text" id="formula-name" placeholder="公式名を入力">
+            </div>
+            <div class="form-group">
+                <label>公式</label>
+                <textarea id="formula-content" placeholder="公式を入力"></textarea>
+            </div>
+            <button onclick="addFormula()">登録</button>
+            <button class="secondary" onclick="startStudy('formula')">学習開始</button>
+            <div class="item-list" id="formula-list"></div>
+        </div>
+
+        <!-- 穴埋め -->
+        <div id="cloze" class="content">
+            <div class="error-message" id="cloze-error"></div>
+            <div class="form-group">
+                <label>教科</label>
+                <select id="cloze-subject">
+                    <option value="国語">国語</option>
+                    <option value="英語">英語</option>
+                    <option value="英語表現">英語表現</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="情報">情報</option>
+                    <option value="数学B">数学B</option>
+                    <option value="数学C">数学C</option>
+                    <option value="社会">社会</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>原文</label>
+                <textarea id="cloze-text" placeholder="原文を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label>答え（穴にする単語をカンマ区切りで入力）</label>
+                <input type="text" id="cloze-answers" placeholder="例: 単語1,単語2,単語3">
+            </div>
+            <button onclick="addCloze()">登録</button>
+            <button class="secondary" onclick="startStudy('cloze')">学習開始</button>
+            <div class="item-list" id="cloze-list"></div>
+        </div>
+
+        <!-- テスト -->
+        <div id="test" class="content">
+            <div class="error-message" id="test-error"></div>
+            <div class="form-group">
+                <label>教科を選択</label>
+                <select id="test-subject">
+                    <option value="国語">国語</option>
+                    <option value="英語">英語</option>
+                    <option value="英語表現">英語表現</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="情報">情報</option>
+                    <option value="数学B">数学B</option>
+                    <option value="数学C">数学C</option>
+                    <option value="社会">社会</option>
+                </select>
+            </div>
+            <button onclick="startTest()">テストスタート</button>
+            <div id="test-area" style="display:none;">
+                <div class="study-view">
+                    <div class="question-display" id="test-question-display"></div>
+                    <div class="control-buttons" id="test-controls"></div>
+                    <div class="stat-info" id="test-stats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUBJECTS = ['国語', '英語', '英語表現', '物理', '化学', '情報', '数学B', '数学C', '社会'];
+        
+        let studyMode = {
+            active: false,
+            type: '',
+            items: [],
+            currentIndex: 0,
+            showingAnswer: false
+        };
+
+        let testMode = {
+            active: false,
+            subject: '',
+            items: [],
+            currentIndex: 0,
+            showingAnswer: false
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+            
+            if (tab !== 'test') {
+                studyMode.active = false;
+                testMode.active = false;
+            }
+        }
+
+        function showError(type, message) {
+            const errorEl = document.getElementById(type + '-error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 3000);
+        }
+
+        function saveData(key, data) {
+            const stored = JSON.parse(localStorage.getItem(key) || '[]');
+            stored.push(data);
+            localStorage.setItem(key, JSON.stringify(stored));
+        }
+
+        function loadData(key) {
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+
+        function updateData(key, index, data) {
+            const stored = loadData(key);
+            stored[index] = data;
+            localStorage.setItem(key, JSON.stringify(stored));
+        }
+
+        function deleteData(key, index) {
+            const stored = loadData(key);
+            stored.splice(index, 1);
+            localStorage.setItem(key, JSON.stringify(stored));
+        }
+
+        function addWord() {
+            const subject = document.getElementById('word-subject').value;
+            const term = document.getElementById('word-term').value.trim();
+            const meaning = document.getElementById('word-meaning').value.trim();
+
+            if (!term) {
+                showError('word', '単語が入力されていません');
+                return;
+            }
+            if (!meaning) {
+                showError('word', '意味が入力されていません');
+                return;
+            }
+
+            const data = {
+                subject,
+                term,
+                meaning,
+                correct: 0,
+                total: 0
+            };
+
+            saveData('words', data);
+            document.getElementById('word-term').value = '';
+            document.getElementById('word-meaning').value = '';
+            displayWords();
+        }
+
+        function displayWords() {
+            const words = loadData('words');
+            const listEl = document.getElementById('word-list');
+            listEl.innerHTML = '';
+
+            words.forEach((word, index) => {
+                const accuracy = word.total > 0 ? Math.round((word.correct / word.total) * 100) : 0;
+                const itemEl = document.createElement('div');
+                itemEl.className = 'item';
+                itemEl.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-subject">${word.subject}</span>
+                        <span class="item-accuracy">正答率: ${accuracy}% (${word.correct}/${word.total})</span>
+                    </div>
+                    <div class="item-content">
+                        <strong>${word.term}</strong> → ${word.meaning}
+                    </div>
+                    <div class="item-actions">
+                        <button class="danger" onclick="deleteItem('words', ${index})">削除</button>
+                    </div>
+                `;
+                listEl.appendChild(itemEl);
+            });
+        }
+
+        function addQA() {
+            const subject = document.getElementById('qa-subject').value;
+            const question = document.getElementById('qa-question').value.trim();
+            const answer = document.getElementById('qa-answer').value.trim();
+
+            if (!question) {
+                showError('qa', '問題が入力されていません');
+                return;
+            }
+            if (!answer) {
+                showError('qa', '答えが入力されていません');
+                return;
+            }
+
+            const data = {
+                subject,
+                question,
+                answer,
+                correct: 0,
+                total: 0
+            };
+
+            saveData('qa', data);
+            document.getElementById('qa-question').value = '';
+            document.getElementById('qa-answer').value = '';
+            displayQA();
+        }
+
+        function displayQA() {
+            const items = loadData('qa');
+            const listEl = document.getElementById('qa-list');
+            listEl.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const accuracy = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+                const itemEl = document.createElement('div');
+                itemEl.className = 'item';
+                itemEl.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-subject">${item.subject}</span>
+                        <span class="item-accuracy">正答率: ${accuracy}% (${item.correct}/${item.total})</span>
+                    </div>
+                    <div class="item-content">
+                        <strong>問題:</strong> ${item.question}<br>
+                        <strong>答え:</strong> ${item.answer}
+                    </div>
+                    <div class="item-actions">
+                        <button class="danger" onclick="deleteItem('qa', ${index})">削除</button>
+                    </div>
+                `;
+                listEl.appendChild(itemEl);
+            });
+        }
+
+        function addFormula() {
+            const subject = document.getElementById('formula-subject').value;
+            const name = document.getElementById('formula-name').value.trim();
+            const content = document.getElementById('formula-content').value.trim();
+
+            if (!name) {
+                showError('formula', '公式名が入力されていません');
+                return;
+            }
+            if (!content) {
+                showError('formula', '公式が入力されていません');
+                return;
+            }
+
+            const data = {
+                subject,
+                name,
+                content,
+                correct: 0,
+                total: 0
+            };
+
+            saveData('formulas', data);
+            document.getElementById('formula-name').value = '';
+            document.getElementById('formula-content').value = '';
+            displayFormulas();
+        }
+
+        function displayFormulas() {
+            const items = loadData('formulas');
+            const listEl = document.getElementById('formula-list');
+            listEl.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const accuracy = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+                const itemEl = document.createElement('div');
+                itemEl.className = 'item';
+                itemEl.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-subject">${item.subject}</span>
+                        <span class="item-accuracy">正答率: ${accuracy}% (${item.correct}/${item.total})</span>
+                    </div>
+                    <div class="item-content">
+                        <strong>${item.name}</strong><br>
+                        ${item.content}
+                    </div>
+                    <div class="item-actions">
+                        <button class="danger" onclick="deleteItem('formulas', ${index})">削除</button>
+                    </div>
+                `;
+                listEl.appendChild(itemEl);
+            });
+        }
+
+        function addCloze() {
+            const subject = document.getElementById('cloze-subject').value;
+            const text = document.getElementById('cloze-text').value.trim();
+            const answersStr = document.getElementById('cloze-answers').value.trim();
+
+            if (!text) {
+                showError('cloze', '原文が入力されていません');
+                return;
+            }
+            if (!answersStr) {
+                showError('cloze', '答えが入力されていません');
+                return;
+            }
+
+            const answers = answersStr.split(',').map(a => a.trim()).filter(a => a);
+            
+            if (answers.length === 0) {
+                showError('cloze', '答えが正しく入力されていません');
+                return;
+            }
+
+            const data = {
+                subject,
+                text,
+                answers,
+                correct: 0,
+                total: 0
+            };
+
+            saveData('cloze', data);
+            document.getElementById('cloze-text').value = '';
+            document.getElementById('cloze-answers').value = '';
+            displayCloze();
+        }
+
+        function displayCloze() {
+            const items = loadData('cloze');
+            const listEl = document.getElementById('cloze-list');
+            listEl.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const accuracy = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+                const itemEl = document.createElement('div');
+                itemEl.className = 'item';
+                itemEl.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-subject">${item.subject}</span>
+                        <span class="item-accuracy">正答率: ${accuracy}% (${item.correct}/${item.total})</span>
+                    </div>
+                    <div class="item-content">
+                        <strong>原文:</strong> ${item.text}<br>
+                        <strong>答え:</strong> ${item.answers.join(', ')}
+                    </div>
+                    <div class="item-actions">
+                        <button class="danger" onclick="deleteItem('cloze', ${index})">削除</button>
+                    </div>
+                `;
+                listEl.appendChild(itemEl);
+            });
+        }
+
+        function deleteItem(type, index) {
+            if (confirm('本当に削除しますか？')) {
+                deleteData(type, index);
+                if (type === 'words') displayWords();
+                else if (type === 'qa') displayQA();
+                else if (type === 'formulas') displayFormulas();
+                else if (type === 'cloze') displayCloze();
+            }
+        }
+
+        function startStudy(type) {
+            const items = loadData(type);
+            
+            if (items.length === 0) {
+                showError(type, '学習する問題が登録されていません');
+                return;
+            }
+
+            studyMode = {
+                active: true,
+                type: type,
+                items: [...items],
+                currentIndex: 0,
+                showingAnswer: false,
+                dataKey: type
+            };
+
+            shuffleArray(studyMode.items);
+            
+            const contentEl = document.getElementById(type);
+            contentEl.innerHTML = `
+                <div class="study-view">
+                    <div class="question-display" id="study-question"></div>
+                    <div class="control-buttons" id="study-controls"></div>
+                    <div class="stat-info" id="study-stats"></div>
+                </div>
+            `;
+            
+            showStudyQuestion();
+        }
+
+        function showStudyQuestion() {
+            if (studyMode.currentIndex >= studyMode.items.length) {
+                endStudy();
+                return;
+            }
+
+            const item = studyMode.items[studyMode.currentIndex];
+            const questionEl = document.getElementById('study-question');
+            const controlsEl = document.getElementById('study-controls');
+            const statsEl = document.getElementById('study-stats');
+
+            let questionHTML = '';
+            
+            if (studyMode.type === 'words') {
+                questionHTML = `<div class="question-text">${item.term}</div>`;
+            } else if (studyMode.type === 'qa') {
+                questionHTML = `<div class="question-text">${item.question}</div>`;
+            } else if (studyMode.type === 'formulas') {
+                questionHTML = `<div class="question-text">${item.name}</div>`;
+            } else if (studyMode.type === 'cloze') {
+                const clozeText = createClozeText(item.text, item.answers);
+                questionHTML = `<div class="question-text">${clozeText}</div>`;
+            }
+
+            questionEl.innerHTML = questionHTML;
+            
+            controlsEl.innerHTML = `
+                <button onclick="showStudyAnswer()">答えを見る</button>
+                <button class="secondary" onclick="endStudy()">終了</button>
+            `;
+
+            const accuracy = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+            statsEl.innerHTML = `問題 ${studyMode.currentIndex + 1}/${studyMode.items.length} | 正答率: ${accuracy}%`;
+            
+            studyMode.showingAnswer = false;
+        }
+
+        function showStudyAnswer() {
+            const item = studyMode.items[studyMode.currentIndex];
+            const questionEl = document.getElementById('study-question');
+            const controlsEl = document.getElementById('study-controls');
+
+            let answerHTML = '';
+            
+            if (studyMode.type === 'words') {
+                answerHTML = `
+                    <div class="question-text">${item.term}</div>
+                    <div class="answer-text">答え: ${item.meaning}</div>
+                `;
+            } else if (studyMode.type === 'qa') {
+                answerHTML = `
+                    <div class="question-text">${item.question}</div>
+                    <div class="answer-text">${item.answer}</div>
+                `;
+            } else if (studyMode.type === 'formulas') {
+                answerHTML = `
+                    <div class="question-text">${item.name}</div>
+                    <div class="answer-text">${item.content}</div>
+                `;
+            } else if (studyMode.type === 'cloze') {
+                answerHTML = `
+                    <div class="question-text">${item.text}</div>
+                    <div class="answer-text">答え: ${item.answers.join(', ')}</div>
+                `;
+            }
+
+            questionEl.innerHTML = answerHTML;
+            
+            controlsEl.innerHTML = `
+                <div class="judgment-buttons">
+                    <button class="success" onclick="judgeAnswer(true)">正解</button>
+                    <button class="danger" onclick="judgeAnswer(false)">不正解</button>
+                </div>
+            `;
+            
+            studyMode.showingAnswer = true;
+        }
+
+        function judgeAnswer(isCorrect) {
+            const item = studyMode.items[studyMode.currentIndex];
+            
+            const allItems = loadData(studyMode.dataKey);
+            const originalIndex = allItems.findIndex(i => 
+                JSON.stringify(i) === JSON.stringify({...item, correct: item.correct, total: item.total})
+            );
+            
+            if (originalIndex !== -1) {
+                allItems[originalIndex].total++;
+                if (isCorrect) {
+                    allItems[originalIndex].correct++;
+                }
+                updateData(studyMode.dataKey, originalIndex, allItems[originalIndex]);
+            }
+            
+            studyMode.items[studyMode.currentIndex] = allItems[originalIndex];
+            studyMode.currentIndex++;
+            showStudyQuestion();
+        }
+
+        function endStudy() {
+            location.reload();
+        }
+
+        function createClozeText(text, answers) {
+            let clozeText = text;
+            const numBlanks = Math.floor(Math.random() * answers.length) + 1;
+            const selectedAnswers = shuffleArray([...answers]).slice(0, numBlanks);
+            
+            selectedAnswers.forEach(answer => {
+                clozeText = clozeText.replace(answer, '<span class="blank">____</span>');
+            });
+            
+            return clozeText;
+        }
+
+        function startTest() {
+            const subject = document.getElementById('test-subject').value;
+            
+            const words = loadData('words').filter(w => w.subject === subject);
+            const qa = loadData('qa').filter(q => q.subject === subject);
+            const formulas = loadData('formulas').filter(f => f.subject === subject);
+            const cloze = loadData('cloze').filter(c => c.subject === subject);
+            
+            const allItems = [
+                ...words.map(w => ({type: 'words', data: w})),
+                ...qa.map(q => ({type: 'qa', data: q})),
+                ...formulas.map(f => ({type: 'formulas', data: f})),
+                ...cloze.map(c => ({type: 'cloze', data: c}))
+            ];
+            
+            if (allItems.length === 0) {
+                showError('test', 'この教科には問題が登録されていません');
+                return;
+            }
+            
+            shuffleArray(allItems);
+            
+            testMode = {
+                active: true,
+                subject: subject,
+                items: allItems,
+                currentIndex: 0,
+                showingAnswer: false
+            };
+            
+            document.getElementById('test-area').style.display = 'block';
+            showTestQuestion();
+        }
+
+        function showTestQuestion() {
+            if (testMode.currentIndex >= testMode.items.length) {
+                endTest();
+                return;
+            }
+
+            const currentItem = testMode.items[testMode.currentIndex];
+            const item = currentItem.data;
+            const questionEl = document.getElementById('test-question-display');
+            const controlsEl = document.getElementById('test-controls');
+            const statsEl = document.getElementById('test-stats');
+
+            let questionHTML = '';
+            
+            if (currentItem.type === 'words') {
+                questionHTML = `<div class="question-text">${item.term}</div>`;
+            } else if (currentItem.type === 'qa') {
+                questionHTML = `<div class="question-text">${item.question}</div>`;
+            } else if (currentItem.type === 'formulas') {
+                questionHTML = `<div class="question-text">${item.name}</div>`;
+            } else if (currentItem.type === 'cloze') {
+                const clozeText = createClozeText(item.text, item.answers);
+                questionHTML = `<div class="question-text">${clozeText}</div>`;
+            }
+
+            questionEl.innerHTML = questionHTML;
+            
+            controlsEl.innerHTML = `
+                <button onclick="showTestAnswer()">答えを見る</button>
+                <button class="secondary" onclick="endTest()">終了</button>
+            `;
+
+            const accuracy = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+            statsEl.innerHTML = `問題 ${testMode.currentIndex + 1}/${testMode.items.length} | 正答率: ${accuracy}%`;
+            
+            testMode.showingAnswer = false;
+        }
+
+        function showTestAnswer() {
+            const currentItem = testMode.items[testMode.currentIndex];
+            const item = currentItem.data;
+            const questionEl = document.getElementById('test-question-display');
+            const controlsEl = document.getElementById('test-controls');
+
+            let answerHTML = '';
+            
+            if (currentItem.type === 'words') {
+                answerHTML = `
+                    <div class="question-text">${item.term}</div>
+                    <div class="answer-text">答え: ${item.meaning}</div>
+                `;
+            } else if (currentItem.type === 'qa') {
+                answerHTML = `
+                    <div class="question-text">${item.question}</div>
+                    <div class="answer-text">${item.answer}</div>
+                `;
+            } else if (currentItem.type === 'formulas') {
+                answerHTML = `
+                    <div class="question-text">${item.name}</div>
+                    <div class="answer-text">${item.content}</div>
+                `;
+            } else if (currentItem.type === 'cloze') {
+                answerHTML = `
+                    <div class="question-text">${item.text}</div>
+                    <div class="answer-text">答え: ${item.answers.join(', ')}</div>
+                `;
+            }
+
+            questionEl.innerHTML = answerHTML;
+            
+            controlsEl.innerHTML = `
+                <div class="judgment-buttons">
+                    <button class="success" onclick="judgeTestAnswer(true)">正解</button>
+                    <button class="danger" onclick="judgeTestAnswer(false)">不正解</button>
+                </div>
+            `;
+            
+            testMode.showingAnswer = true;
+        }
+
+        function judgeTestAnswer(isCorrect) {
+            const currentItem = testMode.items[testMode.currentIndex];
+            const item = currentItem.data;
+            
+            const allItems = loadData(currentItem.type);
+            const originalIndex = allItems.findIndex(i => 
+                JSON.stringify(i) === JSON.stringify({...item, correct: item.correct, total: item.total})
+            );
+            
+            if (originalIndex !== -1) {
+                allItems[originalIndex].total++;
+                if (isCorrect) {
+                    allItems[originalIndex].correct++;
+                }
+                updateData(currentItem.type, originalIndex, allItems[originalIndex]);
+            }
+            
+            testMode.currentIndex++;
+            showTestQuestion();
+        }
+
+        function endTest() {
+            testMode.active = false;
+            document.getElementById('test-area').style.display = 'none';
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        window.onload = function() {
+            displayWords();
+            displayQA();
+            displayFormulas();
+            displayCloze();
+        };
+    </script>
+</body>
+</html>
